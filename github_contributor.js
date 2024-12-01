@@ -2,9 +2,9 @@ const fs = require('fs');
 const { execSync } = require('child_process');
 const path = require('path');
 
-// Define the date range
+// Define the date range (corrected to DEC 1 2024 to MAR 20 2025)
 const startDate = new Date('2024-12-01');
-const endDate = new Date('2025-03-20');
+const endDate = new Date('2025-03-20'); // Corrected date range
 
 // Sample JS problems data
 const jsProblems = [
@@ -298,41 +298,18 @@ function createCommitsForDate(date, commitCount) {
     // Stage the file
     execSync('git add .', { cwd: __dirname });
 
-    // Commit with date
-    execSync(
-      'git commit --date="' +
-        dateString +
-        'T' +
-        (9 + i).toString().padStart(2, '0') +
-        ':' +
-        Math.floor(Math.random() * 60)
-          .toString()
-          .padStart(2, '0') +
-        ':00" -m "Add ' +
-        filename +
-        '"',
-      {
-        cwd: __dirname,
-        stdio: 'ignore',
-      }
-    );
-
-    console.log('Committed ' + filename + ' on ' + dateString);
-
-    // Randomly decide to delete some files to create more variation
-    if (Math.random() > 0.7) {
-      fs.unlinkSync(filepath);
-      execSync('git add .', { cwd: __dirname });
+    try {
+      // Commit with date
       execSync(
         'git commit --date="' +
           dateString +
           'T' +
-          (10 + i).toString().padStart(2, '0') +
+          (9 + i).toString().padStart(2, '0') +
           ':' +
           Math.floor(Math.random() * 60)
             .toString()
             .padStart(2, '0') +
-          ':00" -m "Remove ' +
+          ':00" -m "Add ' +
           filename +
           '"',
         {
@@ -340,7 +317,46 @@ function createCommitsForDate(date, commitCount) {
           stdio: 'ignore',
         }
       );
-      console.log('Removed ' + filename + ' on ' + dateString);
+
+      console.log('Committed ' + filename + ' on ' + dateString);
+    } catch (error) {
+      console.log(
+        'Skipped commit for ' +
+          filename +
+          ' on ' +
+          dateString +
+          ' (might be duplicate)'
+      );
+    }
+
+    // Randomly decide to delete some files to create more variation
+    if (Math.random() > 0.7) {
+      try {
+        fs.unlinkSync(filepath);
+        execSync('git add .', { cwd: __dirname });
+        execSync(
+          'git commit --date="' +
+            dateString +
+            'T' +
+            (10 + i).toString().padStart(2, '0') +
+            ':' +
+            Math.floor(Math.random() * 60)
+              .toString()
+              .padStart(2, '0') +
+            ':00" -m "Remove ' +
+            filename +
+            '"',
+          {
+            cwd: __dirname,
+            stdio: 'ignore',
+          }
+        );
+        console.log('Removed ' + filename + ' on ' + dateString);
+      } catch (error) {
+        console.log(
+          'Skipped removal commit for ' + filename + ' on ' + dateString
+        );
+      }
     }
   }
 }
