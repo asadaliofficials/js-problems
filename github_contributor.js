@@ -3,8 +3,8 @@ const { execSync } = require('child_process');
 const path = require('path');
 
 // Define the date range (corrected to DEC 1 2024 to MAR 20 2025)
-const startDate = new Date('2024-12-01');
-const endDate = new Date('2025-03-20'); // Corrected date range
+const startDate = new Date('2025-11-01');
+const endDate = new Date('2025-11-21'); // Corrected date range
 
 // Sample JS problems data
 const jsProblems = [
